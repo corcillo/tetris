@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tetris</title>
+
+</head>
+
+<body bgcolor="black" >
+  <script src="./grid.js"></script>
+  <script src="./shape.js"></script>
+  <script src="./jquery-1.11.3.js"></script>
+  <link rel="stylesheet" href="./view.css">
+  <div id="canvas-container" align="center">
+      <h1 id="titleText">Tetris</h1>
+      <div id="canvasDiv">
+          <table id="gridTable"></table>
+      </div>
+      
+  </div>
+
+  <script src="./controller.js"></script>
+  <script src="./shapeMaker.js"></script>
+  <script>
+  document.addEventListener('DOMContentLoaded', controllerFunction);
+  </script>
+</body>
+</html>
