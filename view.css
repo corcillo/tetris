@@ -12,9 +12,27 @@
 }
 #titleText{
   color: red;
-  font-family: "Verdana";
+  font-family: "consolas";
   text-align: "center";
-
+  line-height: 1;
+}
+#level{
+  color: skyblue;
+  font-family: "consolas";
+  text-align: "center";
+  line-height: .1;
+}
+#score{
+  color: skyblue;
+  font-family: "consolas";
+  text-align: "center";
+  line-height: .1;
+}
+#mute{
+    height:20px;
+    width:20px;
+    filter:invert(100%);
+    outline: none;
 }
 .emptyCell{
     width:10px; 

@@ -2,9 +2,7 @@
 <html>
 <head>
   <title>Tetris</title>
-
 </head>
-
 <body bgcolor="black" >
   <script src="./grid.js"></script>
   <script src="./shape.js"></script>
@@ -12,14 +10,19 @@
   <link rel="stylesheet" href="./view.css">
   <div id="canvas-container" align="center">
       <h1 id="titleText">Tetris</h1>
+      <h3 id="level">Level 1</h3>
+      <h3 id="score">Score: 0</h3>
       <div id="canvasDiv">
           <table id="gridTable"></table>
       </div>
-      
+      <button type="submit" id="restart">new game</button>  
   </div>
-
+  <div align="center" style="padding-top:10px;">
+    <input type="image" id="mute" state="off" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Speaker_Icon.svg/2000px-Speaker_Icon.svg.png"/>
+  </div>
   <script src="./controller.js"></script>
   <script src="./shapeMaker.js"></script>
+  <script src="./utils.js"></script>
   <script>
   document.addEventListener('DOMContentLoaded', controllerFunction);
   </script>

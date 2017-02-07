@@ -1,24 +1,44 @@
 var grid = function(width,height){
   var that = Object.create(grid.prototype);
-  var initializeEmptyArray = function(){
-    var heightArray = [];
-    for (i = 0 ; i < width ; i++){
-      heightArray.push(0);
-    }
-    return heightArray;
-  }
-
-  var myShapeMaker = shapeMaker(width);
+  var myUtils = utils();
+  var myShapeMaker = shapeMaker(width, myUtils);
   var centerX = Math.floor(width/2.0);
-  var floorHeight = initializeEmptyArray();
-  var shapeList = ["square","T","leftZ", "rightZ","leftL","rightL","line"];
-  var currentIndex = 0;
-  var shapeName = shapeList[currentIndex];
+  var floorHeight = myUtils.initializeEmptyArray(width);
+  var shapeList = myShapeMaker.shapeList();
+  var shapeName = myUtils.getRandomFromList(shapeList);
   var color = myShapeMaker.getColor(shapeName);
-  var fallingShape = shape(width, height, myShapeMaker.getCoords(shapeName), that, color);
+  var pivot = myShapeMaker.getPivot(shapeName);
+  var fallingShape = shape(width, height, myShapeMaker.getCoords(shapeName), that, color, pivot);
+  var score = 0;
+  var level = 1;
+  var levelIncreased = false;
   var gameOver = false;
+  that.resetFallingShape = function(){
+    shapeName = myUtils.getRandomFromList(shapeList);
+    color = myShapeMaker.getColor(shapeName);
+    pivot = myShapeMaker.getPivot(shapeName);
+    fallingShape = shape(width, height, myShapeMaker.getCoords(shapeName), that, color, pivot);
+  }
+  that.setLevelIncreased = function(bool){
+    levelIncreased = bool;
+  }
+  that.getLevelIncreased = function(){
+    return levelIncreased;
+  }
   that.gameOver = function() {
     return gameOver;
+  }
+  that.getLevel = function(){
+    return level;
+  }
+  that.resetLevel = function(){
+    level = 1;
+  }
+  that.getScore = function(){
+    return score;
+  }  
+  that.resetScore = function(){
+    score = 0;
   }
   that.lose = function(){
     gameOver = true;
@@ -29,10 +49,9 @@ var grid = function(width,height){
     if (!fallingShape.isFalling()){
       hasChanged = true;
       that.addShapeToFloor();
-      currentIndex = (currentIndex+1)%shapeList.length;
-      shapeName = shapeList[currentIndex];
+      shapeName = myUtils.getRandomFromList(shapeList);
       color = myShapeMaker.getColor(shapeName);
-      var pivot = myShapeMaker.getPivot(shapeName);
+      pivot = myShapeMaker.getPivot(shapeName);
       fallingShape = shape(width, height, myShapeMaker.getCoords(shapeName), that, color, pivot);
       if (!fallingShape.canExist()){
         that.lose();
@@ -84,6 +103,7 @@ var grid = function(width,height){
     }
     return fullChunks.length>0 ? that.dropRows(fullChunks) : false;
   }
+  //fulllChunks[{bottomRow: x, topRow: y, size: z},{...}]
   that.dropRows = function(fullChunks){
     var lowerIndex = 0;
     var lowerChunk = fullChunks[lowerIndex];
@@ -111,6 +131,15 @@ var grid = function(width,height){
         currentCell.attr("class", aboveCell.attr("class"));
       }
     }
+    score += myUtils.calculatePoints(level, jumpRows);
+    var newLevel = myUtils.calculateLevel(score);
+    if (newLevel > level){
+      level = newLevel;
+      levelIncreased = true;
+      $("#level").text("Level "+level);
+    }
+    console.log(score);
+    $("#score").text("Score: "+score);
   }
 
   Object.freeze(that);

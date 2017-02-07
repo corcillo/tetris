@@ -21,17 +21,15 @@ var shape = function(gridWidth, gridHeight, xys, grid, color, pivot){
   that.fillCell = function(x, y){
     var name = that.getCellName(x,y)
     $(name).attr("class","fullCell");
-    // $(name).attr("color",color);
   }
   that.emptyCell = function(x, y){
     $(that.getCellName(x,y)).attr("class","emptyCell");
     $('.emptyCell').css({"background-color":"skyblue"});
   }
-  that.fillFallCell = function(x, y){
+  var fallCell = function(x, y){
     var cell = $(that.getCellName(x,y));
     cell.attr("class","fallCell");
     cell.css("background-color",color);
-    // $('.fallCell').css({"background-color":color});
   }
   that.checkCellFull = function(x, y){
     return ($(that.getCellName(x,y)).attr("class") == "fullCell");
@@ -42,7 +40,7 @@ var shape = function(gridWidth, gridHeight, xys, grid, color, pivot){
       that.emptyShape();
       xyList.forEach(function(xy){  
         xy[1]+=1;
-        that.fillFallCell(xy[0], xy[1]);
+        fallCell(xy[0], xy[1]);
       });
     } 
   }
@@ -51,7 +49,7 @@ var shape = function(gridWidth, gridHeight, xys, grid, color, pivot){
       that.emptyShape();
       xyList.forEach(function(xy){
         xy[0]+=1;
-        that.fillFallCell(xy[0], xy[1]);
+        fallCell(xy[0], xy[1]);
       });
     }
   }
@@ -60,7 +58,7 @@ var shape = function(gridWidth, gridHeight, xys, grid, color, pivot){
       that.emptyShape();
       xyList.forEach(function(xy){
         xy[0]-=1;
-        that.fillFallCell(xy[0], xy[1]);
+        fallCell(xy[0], xy[1]);
       }); 
     }
   }
@@ -86,7 +84,7 @@ var shape = function(gridWidth, gridHeight, xys, grid, color, pivot){
       xy[1] = newy;
       xy[0] = xy[0] + pivotXY[0] - bumpLeft + bumpRight;
       xy[1] = xy[1] + pivotXY[1];
-      that.fillFallCell(xy[0], xy[1]);
+      fallCell(xy[0], xy[1]);
     }); 
   }
   that.emptyShape = function(){
@@ -99,15 +97,8 @@ var shape = function(gridWidth, gridHeight, xys, grid, color, pivot){
       that.fillCell(xy[0],xy[1]);
     });
   }
-  that.fillFallShape = function(){
-    xyList.forEach(function(xy){
-      that.fillFallCell(xy[0],xy[1]);
-    });
-  }
-
-  var bool = true;
   that.canExist = function(){
-    bool = true;
+    var bool = true;
     xyList.forEach(function(xy){
       if (that.checkCellFull(xy[0]+1,xy[1])){
         bool = false;
@@ -116,7 +107,7 @@ var shape = function(gridWidth, gridHeight, xys, grid, color, pivot){
     return bool;
   }
   var canMoveRight = function(){
-    bool = true;
+    var bool = true;
     xyList.forEach(function(xy){
       if (xy[0] + 1 >= gridWidth || that.checkCellFull(xy[0]+1,xy[1])){
         bool = false;
@@ -125,7 +116,7 @@ var shape = function(gridWidth, gridHeight, xys, grid, color, pivot){
     return bool;
   }
   var canMoveLeft = function(){
-    bool = true;
+    var bool = true;
     xyList.forEach(function(xy){
       if (xy[0] - 1 < 0 || that.checkCellFull(xy[0]-1,xy[1])){
         bool = false;
@@ -137,7 +128,7 @@ var shape = function(gridWidth, gridHeight, xys, grid, color, pivot){
     if (speedFactor > 1){
       speedFactor = 10;
     }
-    bool = true;
+    var bool = true;
     xyList.forEach(function(xy){
       if (that.checkCellFull(xy[0],xy[1]+1) || xy[1] >= gridHeight - 1){
         bool = false;
@@ -155,16 +146,17 @@ var shape = function(gridWidth, gridHeight, xys, grid, color, pivot){
     return bool;
   }
   var canRotate = function(){
-    bool = true;
+    var bool = true;
     var pivotXY = xyList[pivot].slice(0);
     var maxBumpLeft = 0;
     var maxBumpRight = 0;
     var newXYList = [];
+    var preX; var preY; var newX; var newY;
     xyList.forEach(function(xy){
-      var preX = xy[0] - pivotXY[0];
-      var preY = xy[1] - pivotXY[1];
-      var newX = preY;
-      var newY = -1*preX;
+      preX = xy[0] - pivotXY[0];
+      preY = xy[1] - pivotXY[1];
+      newX = preY;
+      newY = -1*preX;
       newX = newX + pivotXY[0];
       newY = newY + pivotXY[1];
       newXYList.push([newX,newY]);
@@ -181,19 +173,12 @@ var shape = function(gridWidth, gridHeight, xys, grid, color, pivot){
         maxBumpRight = Math.max(maxBumpRight, 0 - newX);
       }
     }); 
-    if (maxBumpRight>0){
-      //check if we can move all cells maxBumpRight right
+
+    if (maxBumpRight>0 || maxBumpLeft>0){
       newXYList.forEach(function(xy){
-        if (that.checkCellFull(xy[0] + maxBumpRight,xy[1]) == true){
+        if (that.checkCellFull(xy[0]+maxBumpRight-maxBumpLeft,xy[1]) == true){
           bool = false;
-        } 
-      });
-    } else if (maxBumpLeft > 0){
-      //check if we can move all cells maxBumpLeft left
-      newXYList.forEach(function(xy){
-        if (that.checkCellFull(xy[0]-maxBumpLeft,xy[1]) == true){
-          bool = false;
-        } 
+        }
       });
     }
     return bool == false ? bool : [maxBumpLeft, maxBumpRight];
